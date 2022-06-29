@@ -1,5 +1,4 @@
-<hello name="{{ name }}"></hello>
-<p>Start editing to see some magic happen :)</p>
+<h1>Source Image and Sizing</h1>
 
 <select (change)="dimensionsChanged($event)">
   <option value="1">32x32</option>
@@ -10,6 +9,7 @@
 </select>
 
 <image-cropper
+  #imageCropper
   imageURL="https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/angular.png"
   [maintainAspectRatio]="true"
   [aspectRatio]="ratio"
@@ -17,3 +17,8 @@
   (imageCropped)="imageCropped($event)"
 >
 </image-cropper>
+
+<ng-container *ngIf="mosaicImageDataURL$ | async">
+  <h1>Cropped and Resized Image</h1>
+  <img [src]="mosaicImageDataURL$ | async" />
+</ng-container>

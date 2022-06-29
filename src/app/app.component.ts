@@ -1,15 +1,28 @@
-import { Component, VERSION } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  AfterViewInit,
+  VERSION,
+  ViewChild,
+} from '@angular/core';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, fromEvent, Observable } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Image, InterpolationAlgorithm } from 'image-js';
+import { ImageCropperComponent } from 'ngx-image-cropper';
 
 @Component({
   selector: 'my-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
+  croppedImageDataSubject$: BehaviorSubject<string> =
+    new BehaviorSubject<string>('');
+
+  mosaicImageDataURL$: Observable<string>;
+
   name = 'Angular ' + VERSION.major;
 
   targetWidth = 48;
@@ -18,6 +31,12 @@ export class AppComponent {
   get ratio(): number {
     return this.targetWidth / this.targetHeight;
   }
+
+  constructor() {
+    var x = combineLatest([this.croppedImageDataSubject$]).pipe();
+  }
+
+  ngAfterViewInit(): void {}
 
   dimensionsChanged(val: any) {
     switch (val.target.value) {
@@ -40,9 +59,6 @@ export class AppComponent {
         break;
     }
   }
-
-  croppedImageDataSubject$: BehaviorSubject<string> =
-    new BehaviorSubject<string>('');
 
   imageCropped(event: ImageCroppedEvent) {
     this.croppedImageDataSubject$.next(event.base64);

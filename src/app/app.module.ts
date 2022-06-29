@@ -7,8 +7,8 @@ import { HelloComponent } from './hello.component';
 import { ImageCropperModule } from 'ngx-image-cropper';
 
 @NgModule({
-  imports:      [ BrowserModule, FormsModule, ImageCropperModule ],
-  declarations: [ AppComponent, HelloComponent ],
-  bootstrap:    [ AppComponent ]
+  imports: [BrowserModule, FormsModule, ImageCropperModule],
+  declarations: [AppComponent],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
