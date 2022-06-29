@@ -1,4 +1,5 @@
-<h1>Source Image and Sizing</h1>
+<h1>RxJS and Lego Art</h1>
+<h2>Source Image and Sizing</h2>
 
 <select (change)="dimensionsChanged($event)">
   <option value="1">32x32</option>
@@ -12,13 +13,13 @@
   #imageCropper
   imageURL="https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/angular.png"
   [maintainAspectRatio]="true"
-  [aspectRatio]="ratio"
+  [aspectRatio]="ratio$ | async"
   format="png"
   (imageCropped)="imageCropped($event)"
 >
 </image-cropper>
 
-<ng-container *ngIf="mosaicImageDataURL$ | async">
-  <h1>Cropped and Resized Image</h1>
-  <img [src]="mosaicImageDataURL$ | async" />
+<ng-container *ngIf="mosaicImageDataURL$ | async as mosaicURL">
+  <h2>Cropped and Resized Image</h2>
+  <img [src]="mosaicURL" />
 </ng-container>

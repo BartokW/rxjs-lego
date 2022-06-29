@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { BehaviorSubject, combineLatest, fromEvent, Observable } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { Image, InterpolationAlgorithm } from 'image-js';
 import { ImageCropperComponent } from 'ngx-image-cropper';
 
@@ -23,17 +23,33 @@ export class AppComponent implements AfterViewInit {
 
   mosaicImageDataURL$: Observable<string>;
 
-  name = 'Angular ' + VERSION.major;
+  targetDimensions$: BehaviorSubject<[number, number]> = new BehaviorSubject<
+    [number, number]
+  >([32, 32]);
 
-  targetWidth = 48;
-  targetHeight = 48;
-
-  get ratio(): number {
-    return this.targetWidth / this.targetHeight;
-  }
+  ratio$: Observable<number>;
 
   constructor() {
-    var x = combineLatest([this.croppedImageDataSubject$]).pipe();
+    this.ratio$ = this.targetDimensions$.pipe(
+      map(([x, y]: [number, number]) => {
+        return x / y;
+      })
+    );
+
+    var x = combineLatest([
+      this.targetDimensions$,
+      this.croppedImageDataSubject$,
+    ]).pipe(
+      // filter(([dimensions, image]: [[number, number], string]) => {
+      //   return image !== null && image !== undefined && image !== '';
+      // }),
+      this.resizeImage(),
+      map(([dimensions, image]: [[number, number], string]) => {
+        return image;
+      })
+    );
+
+    this.mosaicImageDataURL$ = x;
   }
 
   ngAfterViewInit(): void {}
@@ -41,26 +57,48 @@ export class AppComponent implements AfterViewInit {
   dimensionsChanged(val: any) {
     switch (val.target.value) {
       case '1':
-        this.targetWidth = this.targetHeight = 32;
+        this.targetDimensions$.next([32, 32]);
         break;
       case '2':
-        this.targetWidth = this.targetHeight = 48;
+        this.targetDimensions$.next([48, 48]);
         break;
       case '3':
-        this.targetWidth = 96;
-        this.targetHeight = 48;
+        this.targetDimensions$.next([96, 48]);
         break;
       case '4':
-        this.targetWidth = 48;
-        this.targetHeight = 96;
+        this.targetDimensions$.next([48, 96]);
         break;
       case '5':
-        this.targetWidth = this.targetHeight = 96;
+        this.targetDimensions$.next([96, 96]);
         break;
     }
   }
 
   imageCropped(event: ImageCroppedEvent) {
+    console.log('cropped');
     this.croppedImageDataSubject$.next(event.base64);
+  }
+
+  resizeImage() {
+    return function <T>(
+      source: Observable<[[number, number], string]>
+    ): Observable<[[number, number], string]> {
+      var x = source.pipe(
+        switchMap(async ([dimensions, image]: [[number, number], string]) => {
+          let newImage: string = '';
+          if (image.length > 0) {
+            const cImage = await Image.load(image);
+            const resized = cImage.resize({
+              width: dimensions[0],
+            });
+            newImage = resized.toDataURL();
+          }
+
+          return [dimensions, newImage] as [[number, number], string];
+        })
+      );
+
+      return x;
+    };
   }
 }

@@ -11,19 +11,20 @@
     "e2e": "ng e2e"
   },
   "dependencies": {
-    "@angular/animations": "^14.0.0",
-    "@angular/common": "^14.0.0",
-    "@angular/compiler": "^14.0.0",
-    "@angular/core": "^14.0.0",
-    "@angular/forms": "^14.0.0",
-    "@angular/platform-browser": "^14.0.0",
-    "@angular/platform-browser-dynamic": "^14.0.0",
-    "@angular/router": "^14.0.0",
-    "image-js": "^0.34.1",
-    "ngx-image-cropper": "^6.2.1",
-    "rxjs": "~7.5.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.11.4"
+    "@angular/animations": "14.0.3",
+    "@angular/common": "14.0.3",
+    "@angular/compiler": "14.0.3",
+    "@angular/core": "14.0.3",
+    "@angular/forms": "14.0.3",
+    "@angular/platform-browser": "14.0.3",
+    "@angular/platform-browser-dynamic": "14.0.3",
+    "@angular/router": "14.0.3",
+    "canvas": "^2.9.3",
+    "image-js": "0.34.1",
+    "ngx-image-cropper": "6.2.1",
+    "rxjs": "7.5.5",
+    "tslib": "2.4.0",
+    "zone.js": "0.11.6"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^14.0.0",
