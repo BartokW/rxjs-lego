@@ -3,21 +3,22 @@ import {
   ElementRef,
   OnInit,
   AfterViewInit,
-  VERSION,
   ViewChild,
 } from '@angular/core';
-import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { BehaviorSubject, combineLatest, fromEvent, Observable } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
-import { Image, InterpolationAlgorithm } from 'image-js';
-import { ImageCropperComponent } from 'ngx-image-cropper';
+import { Image } from 'image-js';
 
 @Component({
   selector: 'my-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent {
+  startingImage =
+    'https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/angular.png';
+
   croppedImageDataSubject$: BehaviorSubject<string> =
     new BehaviorSubject<string>('');
 
@@ -40,10 +41,8 @@ export class AppComponent implements AfterViewInit {
       this.targetDimensions$,
       this.croppedImageDataSubject$,
     ]).pipe(
-      // filter(([dimensions, image]: [[number, number], string]) => {
-      //   return image !== null && image !== undefined && image !== '';
-      // }),
       this.resizeImage(),
+      this.replaceColours(),
       map(([dimensions, image]: [[number, number], string]) => {
         return image;
       })
@@ -51,8 +50,6 @@ export class AppComponent implements AfterViewInit {
 
     this.mosaicImageDataURL$ = x;
   }
-
-  ngAfterViewInit(): void {}
 
   dimensionsChanged(val: any) {
     switch (val.target.value) {
@@ -75,7 +72,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   imageCropped(event: ImageCroppedEvent) {
-    console.log('cropped');
     this.croppedImageDataSubject$.next(event.base64);
   }
 
@@ -83,7 +79,7 @@ export class AppComponent implements AfterViewInit {
     return function <T>(
       source: Observable<[[number, number], string]>
     ): Observable<[[number, number], string]> {
-      var x = source.pipe(
+      return source.pipe(
         switchMap(async ([dimensions, image]: [[number, number], string]) => {
           let newImage: string = '';
           if (image.length > 0) {
@@ -93,12 +89,15 @@ export class AppComponent implements AfterViewInit {
             });
             newImage = resized.toDataURL();
           }
-
           return [dimensions, newImage] as [[number, number], string];
         })
       );
+    };
+  }
 
-      return x;
+  replaceColours() {
+    return function <T>(source: Observable<T>): Observable<T> {
+      return source;
     };
   }
 }

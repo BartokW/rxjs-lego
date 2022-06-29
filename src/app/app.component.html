@@ -10,8 +10,7 @@
 </select>
 
 <image-cropper
-  #imageCropper
-  imageURL="https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/angular.png"
+  [imageURL]="startingImage"
   [maintainAspectRatio]="true"
   [aspectRatio]="ratio$ | async"
   format="png"
