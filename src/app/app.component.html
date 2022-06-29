@@ -1,5 +1,19 @@
 <hello name="{{ name }}"></hello>
 <p>Start editing to see some magic happen :)</p>
-<img
-  src="https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/angular.png"
-/>
+
+<select (change)="dimensionsChanged($event)">
+  <option value="1">32x32</option>
+  <option value="2">48x48</option>
+  <option value="3">96x48</option>
+  <option value="4">48x96</option>
+  <option value="5">96x96</option>
+</select>
+
+<image-cropper
+  imageURL="https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/angular.png"
+  [maintainAspectRatio]="true"
+  [aspectRatio]="ratio"
+  format="png"
+  (imageCropped)="imageCropped($event)"
+>
+</image-cropper>
