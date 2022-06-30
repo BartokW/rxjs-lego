@@ -3,6 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import { AppComponent } from './app.component';
 import { ImageCropperModule } from 'ngx-image-cropper';
@@ -13,6 +15,8 @@ import { ImageCropperModule } from 'ngx-image-cropper';
     BrowserAnimationsModule,
     FormsModule,
     ImageCropperModule,
+    MatCheckboxModule,
+    MatExpansionModule,
     MatSelectModule,
   ],
   declarations: [AppComponent],
