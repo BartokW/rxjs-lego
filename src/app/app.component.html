@@ -1,55 +1,58 @@
-<h1>RxJS and Lego Art</h1>
-<h2>Source Image and Sizing</h2>
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="side" position="end">
+    <ng-container *ngFor="let color of allColors">
+      <mat-checkbox [(ngModel)]="color.selected" (change)="colorsChanged()">
+        <span
+          style="
+            width: 22px;
+            height: 22px;
+            margin-right: 5px;
+            border: 1px solid black;
+          "
+          [style.background]="color.hex"
+          >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span
+        >
+        {{ color.name }}</mat-checkbox
+      ><br />
+    </ng-container>
+  </mat-sidenav>
 
-<mat-form-field appearance="fill">
-  <mat-label>Dimensions</mat-label>
-  <mat-select
-    [(value)]="selectedDimension"
-    (selectionChange)="dimensionsChanged($event.value)"
-  >
-    <mat-option *ngFor="let d of allDimensionOptions" [value]="d">
-      {{ d.label }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
+  <mat-sidenav-content>
+    <h1>RxJS and Lego Art</h1>
+    <h2>Source Image and Sizing</h2>
 
-<image-cropper
-  [imageURL]="startingImage"
-  [maintainAspectRatio]="true"
-  [aspectRatio]="ratio$ | async"
-  format="png"
-  (imageCropped)="imageCropped($event)"
->
-</image-cropper>
+    <mat-form-field appearance="fill">
+      <mat-label>Dimensions</mat-label>
+      <mat-select
+        [(value)]="selectedDimension"
+        (selectionChange)="dimensionsChanged($event.value)"
+      >
+        <mat-option *ngFor="let d of allDimensionOptions" [value]="d">
+          {{ d.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-<mat-expansion-panel>
-  <mat-expansion-panel-header
-    ><mat-panel-title>Colours</mat-panel-title></mat-expansion-panel-header
-  >
-
-  <mat-checkbox
-    *ngFor="let color of allColors"
-    [(ngModel)]="color.selected"
-    (change)="colorsChanged()"
-  >
-    <span
-      style="
-        width: 22px;
-        height: 22px;
-        margin-right: 5px;
-        border: 1px solid black;
-      "
-      [style.background]="color.hex"
-      >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span
+    <image-cropper
+      [imageURL]="startingImage"
+      [maintainAspectRatio]="true"
+      [aspectRatio]="ratio$ | async"
+      format="png"
+      (imageCropped)="imageCropped($event)"
     >
-    {{ color.name }}</mat-checkbox
-  >
-</mat-expansion-panel>
-<ng-container *ngIf="resizedImageDataURL">
-  <h2>Cropped and Resized Image</h2>
-  <img [src]="resizedImageDataURL" />
-</ng-container>
-<ng-container *ngIf="mosaicImageDataURL$ | async as mosaicURL">
-  <h2>Color Replaced Image</h2>
-  <img [src]="mosaicURL" />
-</ng-container>
+    </image-cropper>
+    <p>
+      <button mat-raised-button color="primary" (click)="sidenav.toggle()">
+        Select Colours
+      </button>
+    </p>
+    <ng-container *ngIf="resizedImageDataURL">
+      <h2>Cropped and Resized Image</h2>
+      <img [src]="resizedImageDataURL" />
+    </ng-container>
+    <ng-container *ngIf="mosaicImageDataURL$ | async as mosaicURL">
+      <h2>Color Replaced Image</h2>
+      <img [src]="mosaicURL" />
+    </ng-container>
+  </mat-sidenav-content>
+</mat-sidenav-container>
