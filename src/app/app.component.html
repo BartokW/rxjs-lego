@@ -1,13 +1,17 @@
 <h1>RxJS and Lego Art</h1>
 <h2>Source Image and Sizing</h2>
 
-<select (change)="dimensionsChanged($event)">
-  <option value="1">32x32</option>
-  <option value="2">48x48</option>
-  <option value="3">96x48</option>
-  <option value="4">48x96</option>
-  <option value="5">96x96</option>
-</select>
+<mat-form-field appearance="fill">
+  <mat-label>Dimensions</mat-label>
+  <mat-select
+    [(value)]="initialResolution"
+    (selectionChange)="dimensionsChanged($event)"
+  >
+    <mat-option *ngFor="let d of resolutionOptions" [value]="d">
+      {{ d.label }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
 
 <image-cropper
   [imageURL]="startingImage"

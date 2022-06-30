@@ -19,6 +19,21 @@ export class AppComponent {
   startingImage =
     'https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/angular.png';
 
+  initialResolution: {
+    dimensions: [number, number];
+    label: string;
+  } = { dimensions: [32, 32], label: '32 x 32' };
+  resolutionOptions: {
+    dimensions: [number, number];
+    label: string;
+  }[] = [
+    { dimensions: [32, 32], label: '32 x 32' },
+    { dimensions: [48, 48], label: '48 x 48' },
+    { dimensions: [96, 48], label: '96 x 48' },
+    { dimensions: [48, 96], label: '48 x 96' },
+    { dimensions: [96, 96], label: '96 x 96' },
+  ];
+
   croppedImageDataSubject$: BehaviorSubject<string> =
     new BehaviorSubject<string>('');
 
@@ -52,23 +67,7 @@ export class AppComponent {
   }
 
   dimensionsChanged(val: any) {
-    switch (val.target.value) {
-      case '1':
-        this.targetDimensions$.next([32, 32]);
-        break;
-      case '2':
-        this.targetDimensions$.next([48, 48]);
-        break;
-      case '3':
-        this.targetDimensions$.next([96, 48]);
-        break;
-      case '4':
-        this.targetDimensions$.next([48, 96]);
-        break;
-      case '5':
-        this.targetDimensions$.next([96, 96]);
-        break;
-    }
+    this.targetDimensions$.next(val.value.dimensions);
   }
 
   imageCropped(event: ImageCroppedEvent) {
