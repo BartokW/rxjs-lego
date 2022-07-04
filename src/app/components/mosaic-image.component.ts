@@ -6,10 +6,8 @@ import { BricklinkColor, ColoredPoint } from '../models/colors';
   selector: 'app-mosaic-image',
   template: `
     <svg
-      [attr.width]="imageWidth"
-      [attr.height]="imageHeight"
-      [style.left.px]="-margin"
-      [style.top.px]="-margin"
+      [attr.width]="width"
+      [attr.height]="height"
       [style.background-color]="background.hex"
     >
       <svg:g
@@ -36,9 +34,6 @@ import { BricklinkColor, ColoredPoint } from '../models/colors';
   ],
 })
 export class MosaicImageComponent {
-  margin = 20;
-  imageWidth = 500;
-  imageHeight = 500;
   pieceWidth = 1;
   pieceHeight = 1;
   background: BricklinkColor = {
@@ -53,38 +48,28 @@ export class MosaicImageComponent {
   @Input() isRound: boolean;
 
   @HostBinding('style.width.px') get containerWidth() {
-    return this.imageWidth - this.margin * 2;
+    return this.width; // - this.margin * 2;
   }
 
   @HostBinding('style.height.px') get containerHeight() {
-    return this.imageHeight - this.margin * 2;
+    return this.height; // - this.margin * 2;
   }
 
-  @Input() set width(width: number) {
-    this.imageWidth = width;
-  }
-  @Input() set height(height: number) {
-    this.imageHeight = height;
-  }
+  @Input() width: number = 500;
+  @Input() height: number = 500;
 
   @Input() set backgroundColor(color: BricklinkColor) {
     this.background = color;
   }
 
   @Input() set points(points: ColoredPoint[]) {
-    const { margin, imageWidth, imageHeight } = this;
+    const { width, height } = this;
     if (points) {
       const bounds = getBounds(points);
-      const scaleX = createLinearScale(
-        [bounds.minX, bounds.maxX],
-        [margin, imageWidth - margin]
-      );
-      const scaleY = createLinearScale(
-        [bounds.minY, bounds.maxY],
-        [margin, imageHeight - margin]
-      );
-      this.pieceWidth = scaleX(1) / 2;
-      this.pieceHeight = scaleY(1) / 2;
+      const scaleX = createLinearScale([bounds.minX, bounds.maxX], [0, width]);
+      const scaleY = createLinearScale([bounds.minY, bounds.maxY], [0, height]);
+      this.pieceWidth = scaleX(1);
+      this.pieceHeight = scaleY(1);
       this.computedPoints = points.map((point) => {
         return {
           color: point.color,

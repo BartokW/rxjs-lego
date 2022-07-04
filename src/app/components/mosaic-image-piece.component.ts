@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, AfterViewChecked } from '@angular/core';
 import { ColoredPoint } from '../models/colors';
 
 @Component({
@@ -36,7 +36,11 @@ import { ColoredPoint } from '../models/colors';
     </ng-container>
   `,
 })
-export class MosaicImagePieceComponent {
+export class MosaicImagePieceComponent implements AfterViewChecked {
+  ngAfterViewChecked(): void {
+    //console.log('child');
+    //console.log(this.points);
+  }
   @Input() points: ColoredPoint[];
   @Input() width: number;
   @Input() height: number;

@@ -72,9 +72,9 @@ export class AppComponent {
       })
     );
 
-    this.mosaicHeight$ = this.ratio$.pipe(
-      map((ratio) => {
-        return this.mosaicWidth * ratio;
+    this.mosaicHeight$ = this.targetDimensions$.pipe(
+      map(([x, y]: [number, number]) => {
+        return (this.mosaicWidth * y) / x;
       })
     );
 
