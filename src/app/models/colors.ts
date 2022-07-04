@@ -11,6 +11,13 @@ export interface BricklinkColor {
   selected: boolean;
 }
 
+export interface Bounds {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+}
+
 export const ALL_BRICKLINK_SOLID_COLORS: BricklinkColor[] = [
   {
     name: 'White',

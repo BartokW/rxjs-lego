@@ -54,5 +54,15 @@
       <h2>Color Replaced Image</h2>
       <img [src]="mosaicURL" />
     </ng-container>
+    <<ng-container>
+      <app-mosaic-image
+        [width]="mosaicWidth"
+        [height]="mosaicHeight$ | async"
+        [points]="mosaicPoints"
+        [backgroundColor]="backgroundColor"
+        [isRound]="isRound"
+        [isTile]="isTile"
+      ></app-mosaic-image>
+    </ng-container>
   </mat-sidenav-content>
 </mat-sidenav-container>

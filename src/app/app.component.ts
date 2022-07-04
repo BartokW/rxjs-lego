@@ -43,6 +43,17 @@ export class AppComponent {
 
   resizedImageDataURL: string;
   mosaicImageDataURL$: Observable<string>;
+  mosaicPoints: ColoredPoint[];
+  mosaicWidth: number = 500;
+  mosaicHeight$: Observable<number>;
+  isTile = false;
+  isRound = false;
+  backgroundColor: BricklinkColor = {
+    name: 'Light Bluish Gray',
+    hex: '#afb5c7',
+    id: 86,
+    selected: false,
+  };
 
   targetDimensions$: BehaviorSubject<[number, number]> = new BehaviorSubject<
     [number, number]
@@ -61,6 +72,12 @@ export class AppComponent {
       })
     );
 
+    this.mosaicHeight$ = this.ratio$.pipe(
+      map((ratio) => {
+        return this.mosaicWidth * ratio;
+      })
+    );
+
     this.mosaicImageDataURL$ = combineLatest([
       this.targetDimensions$,
       this.croppedImageDataSubject$,
@@ -71,11 +88,13 @@ export class AppComponent {
 
       this.replaceColours(),
       map(
-        ([dimensions, image, colors]: [
+        ([dimensions, image, colors, points]: [
           [number, number],
           string,
-          BricklinkColor[]
+          BricklinkColor[],
+          ColoredPoint[]
         ]) => {
+          this.mosaicPoints = points;
           return image;
         }
       )
@@ -127,7 +146,9 @@ export class AppComponent {
   replaceColours() {
     return function <T>(
       source: Observable<[[number, number], string, BricklinkColor[]]>
-    ): Observable<[[number, number], string, BricklinkColor[]]> {
+    ): Observable<
+      [[number, number], string, BricklinkColor[], ColoredPoint[]]
+    > {
       return source.pipe(
         switchMap(
           async ([dimensions, image, colors]: [
@@ -135,10 +156,10 @@ export class AppComponent {
             string,
             BricklinkColor[]
           ]) => {
+            const points: ColoredPoint[] = [];
             let newImage: string = '';
             if (image.length > 0) {
               const cImage = await Image.load(image);
-              const points: ColoredPoint[] = [];
               for (let y = 0; y < cImage.height; y++) {
                 for (let x = 0; x < cImage.width; x++) {
                   const color = cImage.getPixelXY(x, y);
@@ -157,10 +178,11 @@ export class AppComponent {
 
               newImage = cImage.toDataURL();
             }
-            return [dimensions, newImage, colors] as [
+            return [dimensions, newImage, colors, points] as [
               [number, number],
               string,
-              BricklinkColor[]
+              BricklinkColor[],
+              ColoredPoint[]
             ];
           }
         )
