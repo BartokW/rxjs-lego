@@ -46,23 +46,38 @@
         Select Colours
       </button>
     </p>
-    <ng-container *ngIf="resizedImageDataURL">
-      <h2>Cropped and Resized Image</h2>
-      <img [src]="resizedImageDataURL" />
-    </ng-container>
-    <ng-container *ngIf="mosaicImageDataURL$ | async as mosaicURL">
-      <h2>Color Replaced Image</h2>
-      <img [src]="mosaicURL" />
-    </ng-container>
-    <ng-container>
-      <app-mosaic-image
-        [width]="mosaicWidth"
-        [height]="mosaicHeight$ | async"
-        [points]="mosaicPoints"
-        [backgroundColor]="backgroundColor"
-        [isRound]="isRound"
-        [isTile]="isTile"
-      ></app-mosaic-image>
-    </ng-container>
+    <table width="90%">
+      <tr>
+        <th>Cropped and Resized Image</th>
+        <th>Color Replaced Image</th>
+      </tr>
+      <tr>
+        <td style="text-align: center">
+          <img *ngIf="resizedImageDataURL" [src]="resizedImageDataURL" />
+        </td>
+        <td style="text-align: center">
+          <ng-container *ngIf="mosaicImageDataURL$ | async as mosaicURL">
+            <img [src]="mosaicURL" />
+          </ng-container>
+        </td>
+      </tr>
+    </table>
+    <table width="90%">
+      <tr>
+        <th>Rendered Mosaic</th>
+      </tr>
+      <tr style="text-align: center">
+        <ng-container>
+          <app-mosaic-image
+            [width]="mosaicWidth"
+            [height]="mosaicHeight$ | async"
+            [points]="mosaicPoints"
+            [backgroundColor]="backgroundColor"
+            [isRound]="isRound"
+            [isTile]="isTile"
+          ></app-mosaic-image>
+        </ng-container>
+      </tr>
+    </table>
   </mat-sidenav-content>
 </mat-sidenav-container>
