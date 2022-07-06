@@ -9,13 +9,13 @@ import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { BehaviorSubject, combineLatest, fromEvent, Observable } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { Image } from 'image-js';
-import { DimensionOption } from './models/dimension-option';
+import { DimensionOption, MosaicFlowType } from './models/dimension-option';
 import {
   ALL_BRICKLINK_SOLID_COLORS,
   BrickLinkColor,
   ColoredPoint,
 } from './models/colors';
-import { getClosestColor } from './helpers/color-algorthims';
+import { getClosestColor } from './helpers/color-algorithms';
 import { hexToRgb } from './helpers/utility';
 
 @Component({
@@ -42,6 +42,9 @@ export class AppComponent {
   croppedImageDataSubject$: BehaviorSubject<string> =
     new BehaviorSubject<string>('');
   selectedColorsSubject$: BehaviorSubject<BrickLinkColor[]>;
+  placeholderPoints$: BehaviorSubject<ColoredPoint[]> = new BehaviorSubject<
+    ColoredPoint[]
+  >([]);
 
   resizedImageDataURL: string;
   mosaicImageDataURL$: Observable<string>;
@@ -84,22 +87,22 @@ export class AppComponent {
       this.targetDimensions$,
       this.croppedImageDataSubject$,
       this.selectedColorsSubject$,
+      this.placeholderPoints$,
     ]).pipe(
+      //Step 1
       this.resizeImage(),
       this.outputResized(),
 
+      //Step 2
       this.replaceColours(),
-      map(
-        ([dimensions, image, colors, points]: [
-          [number, number],
-          string,
-          BrickLinkColor[],
-          ColoredPoint[]
-        ]) => {
-          this.mosaicPoints = points;
-          return image;
-        }
-      )
+
+      //Output the points for the mosaic
+      this.outputPoints(),
+
+      //Finally output the image url after all modifications
+      map(([dimensions, image, colors, points]: MosaicFlowType) => {
+        return image;
+      })
     );
   }
 
@@ -116,16 +119,12 @@ export class AppComponent {
   }
 
   resizeImage() {
-    return function <T>(
-      source: Observable<[[number, number], string, BrickLinkColor[]]>
-    ): Observable<[[number, number], string, BrickLinkColor[]]> {
+    return function (
+      source: Observable<MosaicFlowType>
+    ): Observable<MosaicFlowType> {
       return source.pipe(
         switchMap(
-          async ([dimensions, image, colors]: [
-            [number, number],
-            string,
-            BrickLinkColor[]
-          ]) => {
+          async ([dimensions, image, colors, points]: MosaicFlowType) => {
             let newImage: string = '';
             if (image.length > 0) {
               const cImage = await Image.load(image);
@@ -134,11 +133,7 @@ export class AppComponent {
               });
               newImage = resized.toDataURL();
             }
-            return [dimensions, newImage, colors] as [
-              [number, number],
-              string,
-              BrickLinkColor[]
-            ];
+            return [dimensions, newImage, colors, points] as MosaicFlowType;
           }
         )
       );
@@ -147,17 +142,16 @@ export class AppComponent {
 
   replaceColours() {
     return function <T>(
-      source: Observable<[[number, number], string, BrickLinkColor[]]>
-    ): Observable<
-      [[number, number], string, BrickLinkColor[], ColoredPoint[]]
-    > {
+      source: Observable<MosaicFlowType>
+    ): Observable<MosaicFlowType> {
       return source.pipe(
         switchMap(
-          async ([dimensions, image, colors]: [
-            [number, number],
-            string,
-            BrickLinkColor[]
-          ]) => {
+          async ([
+            dimensions,
+            image,
+            colors,
+            placeholderPoints,
+          ]: MosaicFlowType) => {
             const points: ColoredPoint[] = [];
             let newImage: string = '';
             if (image.length > 0) {
@@ -180,12 +174,7 @@ export class AppComponent {
 
               newImage = cImage.toDataURL();
             }
-            return [dimensions, newImage, colors, points] as [
-              [number, number],
-              string,
-              BrickLinkColor[],
-              ColoredPoint[]
-            ];
+            return [dimensions, newImage, colors, points] as MosaicFlowType;
           }
         )
       );
@@ -193,18 +182,21 @@ export class AppComponent {
   }
 
   outputResized() {
-    return tap(
-      ([dimensions, image, colors]: [
-        [number, number],
-        string,
-        BrickLinkColor[]
-      ]) => {
-        if (image) {
-          this.resizedImageDataURL = image;
-        } else {
-          this.resizedImageDataURL = '';
-        }
+    return tap(([dimensions, image, colors, points]: MosaicFlowType) => {
+      if (image) {
+        this.resizedImageDataURL = image;
+      } else {
+        this.resizedImageDataURL = '';
       }
-    );
+    });
+  }
+  outputPoints() {
+    return tap(([dimensions, image, colors, points]: MosaicFlowType) => {
+      if (points) {
+        this.mosaicPoints = points;
+      } else {
+        this.mosaicPoints = [];
+      }
+    });
   }
 }
