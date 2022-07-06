@@ -71,7 +71,7 @@ export const ALL_BRICKLINK_SOLID_COLORS: BrickLinkColor[] = [
     name: 'Dark Red',
     hex: '#6a0e15',
     id: 59,
-    selected: true,
+    selected: false,
   },
   {
     name: 'Red',
@@ -113,7 +113,7 @@ export const ALL_BRICKLINK_SOLID_COLORS: BrickLinkColor[] = [
     name: 'Reddish Brown',
     hex: '#89351d',
     id: 88,
-    selected: true,
+    selected: false,
   },
   {
     name: 'Brown',
@@ -449,7 +449,7 @@ export const ALL_BRICKLINK_SOLID_COLORS: BrickLinkColor[] = [
     name: 'Purple',
     hex: '#a5499c',
     id: 24,
-    selected: false,
+    selected: true,
   },
   {
     name: 'Light Purple',
