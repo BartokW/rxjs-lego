@@ -64,19 +64,21 @@
     </table>
     <table width="90%">
       <tr>
-        <th>Rendered Mosaic</th>
+        <th style="text-align: left">Rendered Mosaic</th>
       </tr>
-      <tr style="text-align: center">
-        <ng-container>
-          <app-mosaic-image
-            [width]="mosaicWidth"
-            [height]="mosaicHeight$ | async"
-            [points]="mosaicPoints"
-            [backgroundColor]="backgroundColor"
-            [isRound]="isRound"
-            [isTile]="isTile"
-          ></app-mosaic-image>
-        </ng-container>
+      <tr>
+        <td style="text-align: left">
+          <ng-container>
+            <app-mosaic-image
+              [width]="mosaicWidth"
+              [height]="mosaicHeight$ | async"
+              [points]="mosaicPoints"
+              [backgroundColor]="backgroundColor"
+              [isRound]="isRound"
+              [isTile]="isTile"
+            ></app-mosaic-image>
+          </ng-container>
+        </td>
       </tr>
     </table>
   </mat-sidenav-content>
