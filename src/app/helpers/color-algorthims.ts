@@ -1,14 +1,14 @@
-import { BricklinkColor } from '../models/colors';
+import { BrickLinkColor } from '../models/colors';
 import { hexToRgb, rgbToHex } from './utility';
 
 export function getClosestColor(
-  colors: BricklinkColor[],
+  colors: BrickLinkColor[],
   red: number,
   green: number,
   blue: number
-): BricklinkColor {
+): BrickLinkColor {
   let distance = 99999999;
-  let legoColor: BricklinkColor;
+  let legoColor: BrickLinkColor;
   colors.forEach((element) => {
     if (element != null) {
       let existingHex = rgbToHex(red, green, blue);
@@ -28,8 +28,8 @@ export function getClosestColor(
 }
 
 export function rgbDistance(
-  color1: BricklinkColor,
-  color2: BricklinkColor
+  color1: BrickLinkColor,
+  color2: BrickLinkColor
 ): number {
   let [r1, g1, b1] = hexToRgb(color1.hex);
   let [r2, g2, b2] = hexToRgb(color2.hex);

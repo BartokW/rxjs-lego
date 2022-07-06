@@ -1,10 +1,10 @@
 export interface ColoredPoint {
   x: number;
   y: number;
-  color: BricklinkColor;
+  color: BrickLinkColor;
 }
 
-export interface BricklinkColor {
+export interface BrickLinkColor {
   name: string;
   hex: string;
   id: number;
@@ -18,7 +18,7 @@ export interface Bounds {
   maxY: number;
 }
 
-export const ALL_BRICKLINK_SOLID_COLORS: BricklinkColor[] = [
+export const ALL_BRICKLINK_SOLID_COLORS: BrickLinkColor[] = [
   {
     name: 'White',
     hex: '#ffffff',

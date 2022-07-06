@@ -1,6 +1,6 @@
 import { Component, Input, HostBinding } from '@angular/core';
 import { createLinearScale, getBounds } from '../helpers/utility';
-import { BricklinkColor, ColoredPoint } from '../models/colors';
+import { BrickLinkColor, ColoredPoint } from '../models/colors';
 
 @Component({
   selector: 'app-mosaic-image',
@@ -36,7 +36,7 @@ import { BricklinkColor, ColoredPoint } from '../models/colors';
 export class MosaicImageComponent {
   pieceWidth = 1;
   pieceHeight = 1;
-  background: BricklinkColor = {
+  background: BrickLinkColor = {
     name: 'Light Bluish Gray',
     hex: '#afb5c7',
     id: 86,
@@ -58,7 +58,7 @@ export class MosaicImageComponent {
   @Input() width: number = 500;
   @Input() height: number = 500;
 
-  @Input() set backgroundColor(color: BricklinkColor) {
+  @Input() set backgroundColor(color: BrickLinkColor) {
     this.background = color;
   }
 
@@ -66,8 +66,17 @@ export class MosaicImageComponent {
     const { width, height } = this;
     if (points) {
       const bounds = getBounds(points);
-      const scaleX = createLinearScale([bounds.minX, bounds.maxX], [0, width]);
-      const scaleY = createLinearScale([bounds.minY, bounds.maxY], [0, height]);
+      const approximatePieceWidth = width / bounds.maxX;
+      const approximatePieceHeight = height / bounds.maxY;
+
+      const scaleX = createLinearScale(
+        [bounds.minX, bounds.maxX],
+        [0, width - approximatePieceWidth]
+      );
+      const scaleY = createLinearScale(
+        [bounds.minY, bounds.maxY],
+        [0, height - approximatePieceHeight]
+      );
       this.pieceWidth = scaleX(1);
       this.pieceHeight = scaleY(1);
       this.computedPoints = points.map((point) => {

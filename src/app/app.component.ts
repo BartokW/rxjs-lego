@@ -12,7 +12,7 @@ import { Image } from 'image-js';
 import { DimensionOption } from './models/dimension-option';
 import {
   ALL_BRICKLINK_SOLID_COLORS,
-  BricklinkColor,
+  BrickLinkColor,
   ColoredPoint,
 } from './models/colors';
 import { getClosestColor } from './helpers/color-algorthims';
@@ -26,20 +26,22 @@ import { hexToRgb } from './helpers/utility';
 export class AppComponent {
   startingImage =
     'https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/angular.png';
+  // startingImage =
+  //   'https://raw.githubusercontent.com/BartokW/rxjs-lego/main/src/assets/lego.svg';
 
   selectedDimension: DimensionOption;
   allDimensionOptions: DimensionOption[] = [
     { dimensions: [32, 32], label: '32 x 32' },
     { dimensions: [48, 48], label: '48 x 48' },
-    { dimensions: [96, 48], label: '96 x 48' },
-    { dimensions: [48, 96], label: '48 x 96' },
-    { dimensions: [96, 96], label: '96 x 96' },
+    { dimensions: [64, 32], label: '64 x 32' },
+    { dimensions: [32, 64], label: '32 x 64' },
+    { dimensions: [64, 64], label: '64 x 64' },
   ];
-  allColors: BricklinkColor[] = ALL_BRICKLINK_SOLID_COLORS;
+  allColors: BrickLinkColor[] = ALL_BRICKLINK_SOLID_COLORS;
 
   croppedImageDataSubject$: BehaviorSubject<string> =
     new BehaviorSubject<string>('');
-  selectedColorsSubject$: BehaviorSubject<BricklinkColor[]>;
+  selectedColorsSubject$: BehaviorSubject<BrickLinkColor[]>;
 
   resizedImageDataURL: string;
   mosaicImageDataURL$: Observable<string>;
@@ -48,7 +50,7 @@ export class AppComponent {
   mosaicHeight$: Observable<number>;
   isTile = false;
   isRound = false;
-  backgroundColor: BricklinkColor = {
+  backgroundColor: BrickLinkColor = {
     name: 'Light Bluish Gray',
     hex: '#afb5c7',
     id: 86,
@@ -63,7 +65,7 @@ export class AppComponent {
 
   constructor() {
     this.selectedDimension = this.allDimensionOptions[0];
-    this.selectedColorsSubject$ = new BehaviorSubject<BricklinkColor[]>(
+    this.selectedColorsSubject$ = new BehaviorSubject<BrickLinkColor[]>(
       this.allColors.filter((x) => x.selected)
     );
     this.ratio$ = this.targetDimensions$.pipe(
@@ -91,7 +93,7 @@ export class AppComponent {
         ([dimensions, image, colors, points]: [
           [number, number],
           string,
-          BricklinkColor[],
+          BrickLinkColor[],
           ColoredPoint[]
         ]) => {
           this.mosaicPoints = points;
@@ -115,14 +117,14 @@ export class AppComponent {
 
   resizeImage() {
     return function <T>(
-      source: Observable<[[number, number], string, BricklinkColor[]]>
-    ): Observable<[[number, number], string, BricklinkColor[]]> {
+      source: Observable<[[number, number], string, BrickLinkColor[]]>
+    ): Observable<[[number, number], string, BrickLinkColor[]]> {
       return source.pipe(
         switchMap(
           async ([dimensions, image, colors]: [
             [number, number],
             string,
-            BricklinkColor[]
+            BrickLinkColor[]
           ]) => {
             let newImage: string = '';
             if (image.length > 0) {
@@ -135,7 +137,7 @@ export class AppComponent {
             return [dimensions, newImage, colors] as [
               [number, number],
               string,
-              BricklinkColor[]
+              BrickLinkColor[]
             ];
           }
         )
@@ -145,16 +147,16 @@ export class AppComponent {
 
   replaceColours() {
     return function <T>(
-      source: Observable<[[number, number], string, BricklinkColor[]]>
+      source: Observable<[[number, number], string, BrickLinkColor[]]>
     ): Observable<
-      [[number, number], string, BricklinkColor[], ColoredPoint[]]
+      [[number, number], string, BrickLinkColor[], ColoredPoint[]]
     > {
       return source.pipe(
         switchMap(
           async ([dimensions, image, colors]: [
             [number, number],
             string,
-            BricklinkColor[]
+            BrickLinkColor[]
           ]) => {
             const points: ColoredPoint[] = [];
             let newImage: string = '';
@@ -181,7 +183,7 @@ export class AppComponent {
             return [dimensions, newImage, colors, points] as [
               [number, number],
               string,
-              BricklinkColor[],
+              BrickLinkColor[],
               ColoredPoint[]
             ];
           }
@@ -195,7 +197,7 @@ export class AppComponent {
       ([dimensions, image, colors]: [
         [number, number],
         string,
-        BricklinkColor[]
+        BrickLinkColor[]
       ]) => {
         if (image) {
           this.resizedImageDataURL = image;
