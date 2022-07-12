@@ -52,7 +52,7 @@
       </tr>
       <tr>
         <td style="text-align: center">
-          <img *ngIf="resizedImageDataURL" [src]="resizedImageDataURL" />
+          <img *ngIf="resizedImageDataURL$ | async as url" [src]="url" />
         </td>
         <td style="text-align: center">
           <ng-container *ngIf="mosaicImageDataURL$ | async as mosaicURL">
@@ -61,24 +61,24 @@
         </td>
       </tr>
     </table>
-    <table width="90%" *ngIf="mosaicPoints?.length > 0">
-      <tr>
-        <th style="text-align: left">Rendered Mosaic</th>
-      </tr>
-      <tr>
-        <td style="text-align: left">
-          <ng-container>
+    <ng-container *ngIf="mosaicPoints$ | async as points">
+      <table width="90%" *ngIf="points?.length > 0">
+        <tr>
+          <th style="text-align: left">Rendered Mosaic</th>
+        </tr>
+        <tr>
+          <td style="text-align: left">
             <app-mosaic-image
               [width]="mosaicWidth"
               [height]="mosaicHeight$ | async"
-              [points]="mosaicPoints"
+              [points]="points"
               [backgroundColor]="backgroundColor"
               [isRound]="isRound"
               [isTile]="isTile"
             ></app-mosaic-image>
-          </ng-container>
-        </td>
-      </tr>
-    </table>
+          </td>
+        </tr>
+      </table>
+    </ng-container>
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -1,15 +1,9 @@
-import {
-  Component,
-  ElementRef,
-  OnInit,
-  AfterViewInit,
-  ViewChild,
-} from '@angular/core';
-import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
+import { Component } from '@angular/core';
+import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { BehaviorSubject, combineLatest, fromEvent, Observable } from 'rxjs';
-import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Image } from 'image-js';
-import { DimensionOption, MosaicFlowType } from './models/dimension-option';
+import { DimensionOption } from './models/dimension-option';
 import {
   ALL_BRICKLINK_SOLID_COLORS,
   BrickLinkColor,
@@ -46,9 +40,9 @@ export class AppComponent {
     ColoredPoint[]
   >([]);
 
-  resizedImageDataURL: string;
+  resizedImageDataURL$: Observable<string>;
   mosaicImageDataURL$: Observable<string>;
-  mosaicPoints: ColoredPoint[];
+  mosaicPoints$: Observable<ColoredPoint[]>;
   mosaicWidth: number = 500;
   mosaicHeight$: Observable<number>;
   isTile = false;
@@ -83,25 +77,29 @@ export class AppComponent {
       })
     );
 
-    this.mosaicImageDataURL$ = combineLatest([
+    //Step 1 Resize cropped image
+    this.resizedImageDataURL$ = combineLatest([
       this.targetDimensions$,
       this.croppedImageDataSubject$,
+    ]).pipe(this.resizeImage());
+
+    //Step 2 Do colour replacement
+    let mosaicData$ = combineLatest([
+      this.resizedImageDataURL$,
       this.selectedColorsSubject$,
-      this.placeholderPoints$,
-    ]).pipe(
-      //Step 1
-      this.resizeImage(),
-      this.outputResized(),
+    ]).pipe(this.replaceColours());
 
-      //Step 2
-      this.replaceColours(),
-
-      //Output the points for the mosaic
-      this.outputPoints(),
-
-      //Finally output the image url after all modifications
-      map(([dimensions, image, colors, points]: MosaicFlowType) => {
+    // Extract the Color Replaced Image
+    this.mosaicImageDataURL$ = mosaicData$.pipe(
+      map(([image, points]: [string, ColoredPoint[]]) => {
         return image;
+      })
+    );
+
+    // Extract the Coloured points for generating the mosaic image
+    this.mosaicPoints$ = mosaicData$.pipe(
+      map(([image, points]: [string, ColoredPoint[]]) => {
+        return points;
       })
     );
   }
@@ -120,83 +118,55 @@ export class AppComponent {
 
   resizeImage() {
     return function (
-      source: Observable<MosaicFlowType>
-    ): Observable<MosaicFlowType> {
+      source: Observable<[[number, number], string]>
+    ): Observable<string> {
       return source.pipe(
-        switchMap(
-          async ([dimensions, image, colors, points]: MosaicFlowType) => {
-            let newImage: string = '';
-            if (image.length > 0) {
-              const cImage = await Image.load(image);
-              const resized = cImage.resize({
-                width: dimensions[0],
-              });
-              newImage = resized.toDataURL();
-            }
-            return [dimensions, newImage, colors, points] as MosaicFlowType;
+        switchMap(async ([dimensions, image]: [[number, number], string]) => {
+          let newImage: string = '';
+          if (image.length > 0) {
+            const cImage = await Image.load(image);
+            const resized = cImage.resize({
+              width: dimensions[0],
+            });
+            newImage = resized.toDataURL();
           }
-        )
+          return newImage;
+        })
       );
     };
   }
 
   replaceColours() {
     return function <T>(
-      source: Observable<MosaicFlowType>
-    ): Observable<MosaicFlowType> {
+      source: Observable<[string, BrickLinkColor[]]>
+    ): Observable<[string, ColoredPoint[]]> {
       return source.pipe(
-        switchMap(
-          async ([
-            dimensions,
-            image,
-            colors,
-            placeholderPoints,
-          ]: MosaicFlowType) => {
-            const points: ColoredPoint[] = [];
-            let newImage: string = '';
-            if (image.length > 0) {
-              const cImage = await Image.load(image);
-              for (let y = 0; y < cImage.height; y++) {
-                for (let x = 0; x < cImage.width; x++) {
-                  const color = cImage.getPixelXY(x, y);
-                  const newColor = getClosestColor(
-                    colors,
-                    color[0],
-                    color[1],
-                    color[2]
-                  );
+        switchMap(async ([image, colors]: [string, BrickLinkColor[]]) => {
+          const points: ColoredPoint[] = [];
+          let newImage: string = '';
+          if (image.length > 0) {
+            const cImage = await Image.load(image);
+            for (let y = 0; y < cImage.height; y++) {
+              for (let x = 0; x < cImage.width; x++) {
+                const color = cImage.getPixelXY(x, y);
+                const newColor = getClosestColor(
+                  colors,
+                  color[0],
+                  color[1],
+                  color[2]
+                );
 
-                  points.push({ x, y, color: newColor });
-                  let [r, g, b] = hexToRgb(newColor.hex);
-                  cImage.setPixelXY(x, y, [r, g, b, 255]);
-                }
+                points.push({ x, y, color: newColor });
+                let [r, g, b] = hexToRgb(newColor.hex);
+                cImage.setPixelXY(x, y, [r, g, b, 255]);
               }
-
-              newImage = cImage.toDataURL();
             }
-            return [dimensions, newImage, colors, points] as MosaicFlowType;
+
+            newImage = cImage.toDataURL();
           }
-        )
+          return [newImage, points] as [string, ColoredPoint[]];
+        })
       );
     };
-  }
-
-  outputResized() {
-    return tap(([dimensions, image, colors, points]: MosaicFlowType) => {
-      if (image) {
-        this.resizedImageDataURL = image;
-      } else {
-        this.resizedImageDataURL = '';
-      }
-    });
-  }
-  outputPoints() {
-    return tap(([dimensions, image, colors, points]: MosaicFlowType) => {
-      if (points) {
-        this.mosaicPoints = points;
-      } else {
-        this.mosaicPoints = [];
-      }
-    });
   }
 }
